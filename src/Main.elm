@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Utils
 
 
@@ -25,7 +26,7 @@ type PaletteDrawerStatus
     | BackgroundDrawerActive
 
 
-type FieldType
+type FieldName
     = Email
     | FirstName
     | LastName
@@ -51,8 +52,15 @@ type FieldRequirement
     | Optional
 
 
+type FieldType
+    = StringField
+    | DateField
+    | DateWithoutYearField
+
+
 type alias Field =
-    { fieldType : FieldType
+    { fieldName : FieldName
+    , fieldType : FieldType
     , selectionStatus : FieldSelection
     }
 
@@ -84,24 +92,25 @@ type alias Model =
     , buttonTextColor : Color
     , buttonBackgroundColor : Color
     , backgroundColor : Color
+    , needsSaving : Bool
     }
 
 
 initContactFields : List Field
 initContactFields =
-    [ Field Email (Selected Required)
-    , Field FirstName Unselected
-    , Field LastName Unselected
-    , Field PhoneNumber Unselected
-    , Field Country Unselected
-    , Field Street Unselected
-    , Field City Unselected
-    , Field State Unselected
-    , Field PostalCode Unselected
-    , Field Company Unselected
-    , Field JobTitle Unselected
-    , Field Birthday Unselected
-    , Field Anniversary Unselected
+    [ Field Email StringField (Selected Required)
+    , Field FirstName StringField Unselected
+    , Field LastName StringField Unselected
+    , Field PhoneNumber StringField Unselected
+    , Field Country StringField Unselected
+    , Field Street StringField Unselected
+    , Field City StringField Unselected
+    , Field State StringField Unselected
+    , Field PostalCode StringField Unselected
+    , Field Company StringField Unselected
+    , Field JobTitle StringField Unselected
+    , Field Birthday DateWithoutYearField Unselected
+    , Field Anniversary DateField Unselected
     ]
 
 
@@ -119,6 +128,7 @@ init =
     , buttonTextColor = "#ffffff"
     , buttonBackgroundColor = "#ffffff"
     , backgroundColor = "#ffffff"
+    , needsSaving = False
     }
         ! []
 
@@ -129,6 +139,19 @@ init =
 
 type Msg
     = SetPaletteDrawerStatus PaletteDrawerStatus
+    | SelectField FieldName Bool
+    | SetOptional FieldName Bool
+
+
+updateSelectStatus : FieldName -> Bool -> Field -> Field
+updateSelectStatus fieldName selectStatus field =
+    if field.fieldName == fieldName then
+        if selectStatus then
+            { field | selectionStatus = Selected Optional }
+        else
+            { field | selectionStatus = Unselected }
+    else
+        field
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -137,6 +160,17 @@ update msg model =
         SetPaletteDrawerStatus paletteDrawerStatus ->
             { model | paletteDrawerStatus = paletteDrawerStatus } ! []
 
+        SelectField fieldName selectStatus ->
+            let
+                contactFields =
+                    model.contactFields
+                        |> List.map (\field -> updateSelectStatus fieldName selectStatus field)
+            in
+                { model | contactFields = contactFields } ! []
+
+        SetOptional fieldName optionalValue ->
+            model ! []
+
 
 
 -- View
@@ -144,8 +178,154 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    h1 []
-        [ text "Hello " ]
+    div [ class "container" ]
+        [ div [ class "row" ]
+            [ sidebar model
+            , spacer
+            , mainBody model
+            ]
+        ]
+
+
+spacer : Html Msg
+spacer =
+    div [ class "col-md-2" ] []
+
+
+requiredBox : Field -> Html Msg
+requiredBox field =
+    case field.selectionStatus of
+        Unselected ->
+            div [] []
+
+        _ ->
+            input [ onCheck (SetOptional field.fieldName), style [ ( "float", "right" ) ], type_ "checkbox", checked False ] []
+
+
+requiredText : Field -> String
+requiredText field =
+    case field.selectionStatus of
+        Unselected ->
+            ""
+
+        Selected Optional ->
+            ""
+
+        Selected Required ->
+            "*"
+
+
+selectElement : Field -> Html Msg
+selectElement field =
+    let
+        isChecked =
+            not (field.selectionStatus == Unselected)
+    in
+        div []
+            [ input [ onCheck (SelectField field.fieldName), type_ "checkbox", checked isChecked ] []
+            , span [ style [ ( "margin-left", "5px" ) ] ] [ text (fieldNameString field.fieldName) ]
+            , requiredBox field
+            ]
+
+
+sidebar : Model -> Html Msg
+sidebar model =
+    div [ class "col-md-2" ]
+        (model.contactFields
+            |> List.map selectElement
+        )
+
+
+fieldDisplay : Field -> Html Msg
+fieldDisplay field =
+    let
+        name =
+            fieldNameString field.fieldName
+    in
+        case field.fieldType of
+            StringField ->
+                div [ class "form-group" ]
+                    [ label [ for name ]
+                        [ text (requiredText field ++ name) ]
+                    , input [ class "form-control", id name, placeholder name ]
+                        []
+                    ]
+
+            DateField ->
+                div [ class "form-group" ]
+                    [ label [ for name ]
+                        [ text name ]
+                    , input [ class "form-control", id name, placeholder "month" ]
+                        []
+                    , input [ class "form-control", id name, placeholder "day" ]
+                        []
+                    , input [ class "form-control", id name, placeholder "year" ]
+                        []
+                    ]
+
+            _ ->
+                div [ class "form-group" ]
+                    [ label [ for name ]
+                        [ text name ]
+                    , input [ class "form-control", id name, placeholder "month" ]
+                        []
+                    , input [ class "form-control", id name, placeholder "day" ]
+                        []
+                    ]
+
+
+mainBody : Model -> Html Msg
+mainBody model =
+    div [ class "col-md-8" ]
+        [ Html.form []
+            (model.contactFields
+                |> List.filter (\field -> field.selectionStatus /= Unselected)
+                |> List.map fieldDisplay
+            )
+        ]
+
+
+fieldNameString : FieldName -> String
+fieldNameString name =
+    case name of
+        Email ->
+            "email"
+
+        FirstName ->
+            "first name"
+
+        LastName ->
+            "last name"
+
+        PhoneNumber ->
+            "phone"
+
+        Country ->
+            "country"
+
+        Street ->
+            "street"
+
+        City ->
+            "city"
+
+        State ->
+            "state"
+
+        PostalCode ->
+            "postal code"
+
+        Company ->
+            "company"
+
+        JobTitle ->
+            "job title"
+
+        Birthday ->
+            "birthday"
+
+        Anniversary ->
+            "anniversary"
 
 
 
