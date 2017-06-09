@@ -144,6 +144,17 @@ type Msg
     | SetOptional FieldName Bool
 
 
+updateFieldRequirement : FieldName -> Bool -> Field -> Field
+updateFieldRequirement fieldName selectStatus field =
+    if field.fieldName == fieldName then
+        if selectStatus then
+            { field | selectionStatus = Selected Required }
+        else
+            { field | selectionStatus = Selected Optional }
+    else
+        field
+
+
 updateSelectStatus : FieldName -> Bool -> Field -> Field
 updateSelectStatus fieldName selectStatus field =
     if field.fieldName == fieldName then
@@ -170,7 +181,12 @@ update msg model =
                 { model | contactFields = contactFields } ! []
 
         SetOptional fieldName optionalValue ->
-            model ! []
+            let
+                contactFields =
+                    model.contactFields
+                        |> List.map (\field -> updateFieldRequirement fieldName optionalValue field)
+            in
+                { model | contactFields = contactFields } ! []
 
 
 
@@ -195,15 +211,30 @@ spacer =
 
 requiredBox : Field -> Html Msg
 requiredBox field =
-    case field.selectionStatus of
-        Unselected ->
-            div [] []
+    let
+        isChecked =
+            case field.selectionStatus of
+                Immutable ->
+                    True
 
-        Immutable ->
-            div [] []
+                Unselected ->
+                    False
 
-        _ ->
-            input [ onCheck (SetOptional field.fieldName), style [ ( "float", "right" ) ], type_ "checkbox", checked False ] []
+                Selected Required ->
+                    True
+
+                Selected Optional ->
+                    False
+    in
+        case field.selectionStatus of
+            Unselected ->
+                div [] []
+
+            Immutable ->
+                div [] []
+
+            _ ->
+                input [ onCheck (SetOptional field.fieldName), style [ ( "float", "right" ) ], type_ "checkbox", checked isChecked ] []
 
 
 requiredText : Field -> String
@@ -267,7 +298,7 @@ fieldDisplay field =
             DateField ->
                 div [ class "form-group" ]
                     [ label [ for name ]
-                        [ text name ]
+                        [ text (requiredText field ++ name) ]
                     , input [ class "form-control", id name, placeholder "month" ]
                         []
                     , input [ class "form-control", id name, placeholder "day" ]
@@ -279,7 +310,7 @@ fieldDisplay field =
             DateWithoutYearField ->
                 div [ class "form-group" ]
                     [ label [ for name ]
-                        [ text name ]
+                        [ text (requiredText field ++ name) ]
                     , input [ class "form-control", id name, placeholder "month" ]
                         []
                     , input [ class "form-control", id name, placeholder "day" ]
