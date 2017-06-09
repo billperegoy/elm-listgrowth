@@ -234,7 +234,10 @@ requiredBox field =
                 div [] []
 
             _ ->
-                input [ onCheck (SetOptional field.fieldName), style [ ( "float", "right" ) ], type_ "checkbox", checked isChecked ] []
+                label [ class "switch" ]
+                    [ input [ onCheck (SetOptional field.fieldName), style [ ( "float", "right" ) ], type_ "checkbox", checked isChecked ] []
+                    , div [ class "slider round" ] []
+                    ]
 
 
 requiredText : Field -> String
@@ -261,23 +264,37 @@ selectElement field =
 
         selectCheckbox =
             if field.selectionStatus == Immutable then
-                span [ style [ ( "margin-right", "12px" ) ] ] [ text "" ]
+                div [] []
             else
-                input [ onCheck (SelectField field.fieldName), type_ "checkbox", checked isChecked ] []
+                label [ class "switch" ]
+                    [ input [ onCheck (SelectField field.fieldName), type_ "checkbox", checked isChecked ] []
+                    , div [ class "slider round" ] []
+                    ]
     in
-        div []
-            [ selectCheckbox
-            , span [ style [ ( "margin-left", "5px" ) ] ] [ text (fieldNameString field.fieldName) ]
-            , requiredBox field
+        tr []
+            [ td [] [ selectCheckbox ]
+            , td [] [ h4 [] [ text (fieldNameString field.fieldName) ] ]
+            , td [] [ (requiredBox field) ]
             ]
 
 
 sidebar : Model -> Html Msg
 sidebar model =
     div [ class "col-md-2" ]
-        (model.contactFields
-            |> List.map selectElement
-        )
+        [ table [ class "table" ]
+            [ thead []
+                [ tr []
+                    [ th [] [ h4 [] [ text "select?" ] ]
+                    , th [] [ h4 [] [ text "field name" ] ]
+                    , th [] [ h4 [] [ text "required?" ] ]
+                    ]
+                ]
+            , tbody []
+                (model.contactFields
+                    |> List.map selectElement
+                )
+            ]
+        ]
 
 
 fieldDisplay : Field -> Html Msg
