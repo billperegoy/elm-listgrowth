@@ -43,7 +43,8 @@ type FieldName
 
 
 type FieldSelection
-    = Unselected
+    = Immutable
+    | Unselected
     | Selected FieldRequirement
 
 
@@ -98,7 +99,7 @@ type alias Model =
 
 initContactFields : List Field
 initContactFields =
-    [ Field Email StringField (Selected Required)
+    [ Field Email StringField Immutable
     , Field FirstName StringField Unselected
     , Field LastName StringField Unselected
     , Field PhoneNumber StringField Unselected
@@ -198,6 +199,9 @@ requiredBox field =
         Unselected ->
             div [] []
 
+        Immutable ->
+            div [] []
+
         _ ->
             input [ onCheck (SetOptional field.fieldName), style [ ( "float", "right" ) ], type_ "checkbox", checked False ] []
 
@@ -207,6 +211,9 @@ requiredText field =
     case field.selectionStatus of
         Unselected ->
             ""
+
+        Immutable ->
+            "*"
 
         Selected Optional ->
             ""
@@ -220,9 +227,15 @@ selectElement field =
     let
         isChecked =
             not (field.selectionStatus == Unselected)
+
+        selectCheckbox =
+            if field.selectionStatus == Immutable then
+                span [ style [ ( "margin-right", "12px" ) ] ] [ text "" ]
+            else
+                input [ onCheck (SelectField field.fieldName), type_ "checkbox", checked isChecked ] []
     in
         div []
-            [ input [ onCheck (SelectField field.fieldName), type_ "checkbox", checked isChecked ] []
+            [ selectCheckbox
             , span [ style [ ( "margin-left", "5px" ) ] ] [ text (fieldNameString field.fieldName) ]
             , requiredBox field
             ]
@@ -263,7 +276,7 @@ fieldDisplay field =
                         []
                     ]
 
-            _ ->
+            DateWithoutYearField ->
                 div [ class "form-group" ]
                     [ label [ for name ]
                         [ text name ]
