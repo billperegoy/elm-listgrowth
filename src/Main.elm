@@ -141,7 +141,7 @@ init =
 type Msg
     = SetPaletteDrawerStatus PaletteDrawerStatus
     | SelectField FieldName Bool
-    | SetOptional FieldName Bool
+    | SetRequired FieldName Bool
 
 
 updateFieldRequirement : FieldName -> Bool -> Field -> Field
@@ -180,11 +180,11 @@ update msg model =
             in
                 { model | contactFields = contactFields } ! []
 
-        SetOptional fieldName optionalValue ->
+        SetRequired fieldName requiredValue ->
             let
                 contactFields =
                     model.contactFields
-                        |> List.map (\field -> updateFieldRequirement fieldName optionalValue field)
+                        |> List.map (\field -> updateFieldRequirement fieldName requiredValue field)
             in
                 { model | contactFields = contactFields } ! []
 
@@ -213,47 +213,23 @@ requiredBox : Field -> Html Msg
 requiredBox field =
     let
         isChecked =
-            case field.selectionStatus of
-                Immutable ->
-                    True
-
-                Unselected ->
-                    False
-
-                Selected Required ->
-                    True
-
-                Selected Optional ->
-                    False
+            field.selectionStatus == Selected Required
     in
-        case field.selectionStatus of
-            Unselected ->
-                div [] []
-
-            Immutable ->
-                div [] []
-
-            _ ->
-                label [ class "switch" ]
-                    [ input [ onCheck (SetOptional field.fieldName), style [ ( "float", "right" ) ], type_ "checkbox", checked isChecked ] []
-                    , div [ class "slider round" ] []
-                    ]
+        if List.member field.selectionStatus [ Unselected, Immutable ] then
+            div [] []
+        else
+            label [ class "switch" ]
+                [ input [ onCheck (SetRequired field.fieldName), type_ "checkbox", checked isChecked ] []
+                , div [ class "slider round" ] []
+                ]
 
 
 requiredText : Field -> String
 requiredText field =
-    case field.selectionStatus of
-        Unselected ->
-            ""
-
-        Immutable ->
-            "*"
-
-        Selected Optional ->
-            ""
-
-        Selected Required ->
-            "*"
+    if List.member field.selectionStatus [ Immutable, Selected Required ] then
+        "*"
+    else
+        ""
 
 
 selectElement : Field -> Html Msg
