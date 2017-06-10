@@ -197,7 +197,7 @@ view : Model -> Html Msg
 view model =
     div [ style [ ( "margin-top", "25px" ) ], class "container" ]
         [ div [ class "row" ]
-            [ sidebar model
+            [ sidebar model.contactFields
             , spacer
             , mainBody model
             ]
@@ -254,21 +254,31 @@ selectElement field =
             ]
 
 
-sidebar : Model -> Html Msg
-sidebar model =
+sidebarTableHeader : Html Msg
+sidebarTableHeader =
+    thead []
+        [ tr [ class "active" ]
+            [ th [] [ h4 [] [ text "select?" ] ]
+            , th [] [ h4 [] [ text "field name" ] ]
+            , th [] [ h4 [] [ text "required?" ] ]
+            ]
+        ]
+
+
+sidebarTableBody : List Field -> Html Msg
+sidebarTableBody fields =
+    tbody []
+        (fields
+            |> List.map selectElement
+        )
+
+
+sidebar : List Field -> Html Msg
+sidebar fields =
     div [ class "col-md-2" ]
         [ table [ class "table" ]
-            [ thead []
-                [ tr [ class "active" ]
-                    [ th [] [ h4 [] [ text "select?" ] ]
-                    , th [] [ h4 [] [ text "field name" ] ]
-                    , th [] [ h4 [] [ text "required?" ] ]
-                    ]
-                ]
-            , tbody []
-                (model.contactFields
-                    |> List.map selectElement
-                )
+            [ sidebarTableHeader
+            , sidebarTableBody fields
             ]
         ]
 
