@@ -195,7 +195,7 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "container" ]
+    div [ style [ ( "margin-top", "25px" ) ], class "container" ]
         [ div [ class "row" ]
             [ sidebar model
             , spacer
@@ -283,7 +283,7 @@ sidebar model =
     div [ class "col-md-2" ]
         [ table [ class "table" ]
             [ thead []
-                [ tr []
+                [ tr [ class "active" ]
                     [ th [] [ h4 [] [ text "select?" ] ]
                     , th [] [ h4 [] [ text "field name" ] ]
                     , th [] [ h4 [] [ text "required?" ] ]
@@ -337,7 +337,7 @@ fieldDisplay field =
 
 mainBody : Model -> Html Msg
 mainBody model =
-    div [ class "col-md-8" ]
+    div [ class "col-md-4" ]
         [ Html.form []
             (model.contactFields
                 |> List.filter (\field -> field.selectionStatus /= Unselected)
