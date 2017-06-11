@@ -240,9 +240,12 @@ toggleSwitch action fieldName isChecked =
         ]
 
 
-selectElement : Field -> Html Msg
-selectElement field =
+sidebarTableRow : Field -> Html Msg
+sidebarTableRow field =
     let
+        fieldElement =
+            h4 [] [ text (fieldNameString field.fieldName) ]
+
         isChecked =
             field.selectionStatus /= Unselected
 
@@ -254,7 +257,7 @@ selectElement field =
     in
         tr []
             [ td [] [ selectCheckbox ]
-            , td [] [ h4 [] [ text (fieldNameString field.fieldName) ] ]
+            , td [] [ fieldElement ]
             , td [] [ (requiredBox field) ]
             ]
 
@@ -274,7 +277,7 @@ sidebarTableBody : List Field -> Html Msg
 sidebarTableBody fields =
     tbody []
         (fields
-            |> List.map selectElement
+            |> List.map sidebarTableRow
         )
 
 
