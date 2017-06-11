@@ -228,7 +228,7 @@ requiredText field =
         ""
 
 
-toggleSwitch : (a -> Bool -> Msg) -> a -> Bool -> Html Msg
+toggleSwitch : (FieldName -> Bool -> Msg) -> FieldName -> Bool -> Html Msg
 toggleSwitch action fieldName isChecked =
     label [ class "switch" ]
         [ input [ onCheck (action fieldName), type_ "checkbox", checked isChecked ] []
