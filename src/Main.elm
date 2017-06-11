@@ -143,28 +143,6 @@ type Msg
     | SetRequired FieldName Bool
 
 
-updateFieldRequirement : FieldName -> Bool -> Field -> Field
-updateFieldRequirement fieldName selectStatus field =
-    if field.fieldName == fieldName then
-        if selectStatus then
-            { field | selectionStatus = Selected Required }
-        else
-            { field | selectionStatus = Selected Optional }
-    else
-        field
-
-
-updateSelectStatus : FieldName -> Bool -> Field -> Field
-updateSelectStatus fieldName selectStatus field =
-    if field.fieldName == fieldName then
-        if selectStatus then
-            { field | selectionStatus = Selected Optional }
-        else
-            { field | selectionStatus = Unselected }
-    else
-        field
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -186,6 +164,28 @@ update msg model =
                         |> List.map (\field -> updateFieldRequirement fieldName requiredValue field)
             in
                 { model | contactFields = contactFields } ! []
+
+
+updateFieldRequirement : FieldName -> Bool -> Field -> Field
+updateFieldRequirement fieldName selectStatus field =
+    if field.fieldName == fieldName then
+        if selectStatus then
+            { field | selectionStatus = Selected Required }
+        else
+            { field | selectionStatus = Selected Optional }
+    else
+        field
+
+
+updateSelectStatus : FieldName -> Bool -> Field -> Field
+updateSelectStatus fieldName selectStatus field =
+    if field.fieldName == fieldName then
+        if selectStatus then
+            { field | selectionStatus = Selected Optional }
+        else
+            { field | selectionStatus = Unselected }
+    else
+        field
 
 
 
