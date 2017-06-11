@@ -3,7 +3,6 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Utils
 
 
 main : Program Never Model Msg
@@ -218,7 +217,7 @@ requiredBox field =
         if List.member field.selectionStatus [ Unselected, Immutable ] then
             div [] []
         else
-            toggleSwitchRequired field.fieldName isChecked
+            toggleSwitch SetRequired field.fieldName isChecked
 
 
 requiredText : Field -> String
@@ -229,18 +228,10 @@ requiredText field =
         ""
 
 
-toggleSwitchSelect : FieldName -> Bool -> Html Msg
-toggleSwitchSelect fieldName isChecked =
+toggleSwitch : (a -> Bool -> Msg) -> a -> Bool -> Html Msg
+toggleSwitch action fieldName isChecked =
     label [ class "switch" ]
-        [ input [ onCheck (SelectField fieldName), type_ "checkbox", checked isChecked ] []
-        , div [ class "slider round" ] []
-        ]
-
-
-toggleSwitchRequired : FieldName -> Bool -> Html Msg
-toggleSwitchRequired fieldName isChecked =
-    label [ class "switch" ]
-        [ input [ onCheck (SetRequired fieldName), type_ "checkbox", checked isChecked ] []
+        [ input [ onCheck (action fieldName), type_ "checkbox", checked isChecked ] []
         , div [ class "slider round" ] []
         ]
 
@@ -255,7 +246,7 @@ selectElement field =
             if field.selectionStatus == Immutable then
                 div [] []
             else
-                toggleSwitchSelect field.fieldName isChecked
+                toggleSwitch SelectField field.fieldName isChecked
     in
         tr []
             [ td [] [ selectCheckbox ]
