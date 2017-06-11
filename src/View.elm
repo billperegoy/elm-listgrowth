@@ -37,9 +37,9 @@ requiredBox field =
 requiredText : Field -> String
 requiredText field =
     if List.member field.selectionStatus [ Immutable, Selected Required ] then
-        "*"
+        "*" ++ fieldNameString field.fieldName
     else
-        ""
+        fieldNameString field.fieldName
 
 
 toggleSwitch : (FieldName -> Bool -> Msg) -> FieldName -> Bool -> Html Msg
@@ -108,7 +108,7 @@ fieldDisplay field =
             StringField ->
                 div [ class "form-group" ]
                     [ label [ for name ]
-                        [ text (requiredText field ++ name) ]
+                        [ text (requiredText field) ]
                     , input [ class "form-control", id name, placeholder name ]
                         []
                     ]
@@ -116,7 +116,7 @@ fieldDisplay field =
             DateField ->
                 div [ class "form-group" ]
                     [ label [ for name ]
-                        [ text (requiredText field ++ name) ]
+                        [ text (requiredText field) ]
                     , input [ class "form-control", id name, placeholder "month" ]
                         []
                     , input [ class "form-control", id name, placeholder "day" ]
@@ -128,7 +128,7 @@ fieldDisplay field =
             DateWithoutYearField ->
                 div [ class "form-group" ]
                     [ label [ for name ]
-                        [ text (requiredText field ++ name) ]
+                        [ text (requiredText field) ]
                     , input [ class "form-control", id name, placeholder "month" ]
                         []
                     , input [ class "form-control", id name, placeholder "day" ]
