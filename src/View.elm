@@ -85,10 +85,7 @@ sidebarTableHeader =
 
 sidebarTableBody : List Field -> Html Msg
 sidebarTableBody fields =
-    tbody []
-        (fields
-            |> List.map sidebarTableRow
-        )
+    tbody [] (fields |> List.map sidebarTableRow)
 
 
 sidebar : List Field -> Html Msg
