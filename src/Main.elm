@@ -1,10 +1,10 @@
 module Main exposing (..)
 
+import Html
 import Model exposing (..)
 import View
 import Update
 import Subscriptions
-import Html exposing (..)
 
 
 main : Program Never Model Msg
