@@ -218,7 +218,7 @@ requiredBox field =
         if List.member field.selectionStatus [ Unselected, Immutable ] then
             div [] []
         else
-            toggleSwitch field.fieldName isChecked
+            toggleSwitchRequired field.fieldName isChecked
 
 
 requiredText : Field -> String
@@ -229,10 +229,18 @@ requiredText field =
         ""
 
 
-toggleSwitch : FieldName -> Bool -> Html Msg
-toggleSwitch fieldName isChecked =
+toggleSwitchSelect : FieldName -> Bool -> Html Msg
+toggleSwitchSelect fieldName isChecked =
     label [ class "switch" ]
         [ input [ onCheck (SelectField fieldName), type_ "checkbox", checked isChecked ] []
+        , div [ class "slider round" ] []
+        ]
+
+
+toggleSwitchRequired : FieldName -> Bool -> Html Msg
+toggleSwitchRequired fieldName isChecked =
+    label [ class "switch" ]
+        [ input [ onCheck (SetRequired fieldName), type_ "checkbox", checked isChecked ] []
         , div [ class "slider round" ] []
         ]
 
@@ -247,7 +255,7 @@ selectElement field =
             if field.selectionStatus == Immutable then
                 div [] []
             else
-                toggleSwitch field.fieldName isChecked
+                toggleSwitchSelect field.fieldName isChecked
     in
         tr []
             [ td [] [ selectCheckbox ]
