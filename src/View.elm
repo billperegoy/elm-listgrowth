@@ -34,8 +34,8 @@ requiredBox field =
             toggleSwitch SetRequired field.fieldName isChecked
 
 
-requiredText : Field -> String
-requiredText field =
+fieldDisplayText : Field -> String
+fieldDisplayText field =
     if List.member field.selectionStatus [ Immutable, Selected Required ] then
         "*" ++ fieldNameString field.fieldName
     else
@@ -108,7 +108,7 @@ fieldDisplay field =
             StringField ->
                 div [ class "form-group" ]
                     [ label [ for name ]
-                        [ text (requiredText field) ]
+                        [ text (fieldDisplayText field) ]
                     , input [ class "form-control", id name, placeholder name ]
                         []
                     ]
@@ -116,7 +116,7 @@ fieldDisplay field =
             DateField ->
                 div [ class "form-group" ]
                     [ label [ for name ]
-                        [ text (requiredText field) ]
+                        [ text (fieldDisplayText field) ]
                     , input [ class "form-control", id name, placeholder "month" ]
                         []
                     , input [ class "form-control", id name, placeholder "day" ]
@@ -128,7 +128,7 @@ fieldDisplay field =
             DateWithoutYearField ->
                 div [ class "form-group" ]
                     [ label [ for name ]
-                        [ text (requiredText field) ]
+                        [ text (fieldDisplayText field) ]
                     , input [ class "form-control", id name, placeholder "month" ]
                         []
                     , input [ class "form-control", id name, placeholder "day" ]
