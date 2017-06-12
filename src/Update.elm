@@ -10,32 +10,16 @@ update msg model =
             { model | paletteDrawerStatus = paletteDrawerStatus } ! []
 
         SetSelected fieldName True ->
-            { model
-                | contactFields =
-                    transformOneField fieldName (Selected Optional) model.contactFields
-            }
-                ! []
+            { model | contactFields = transformOneField fieldName (Selected Optional) model.contactFields } ! []
 
         SetSelected fieldName False ->
-            { model
-                | contactFields =
-                    transformOneField fieldName Unselected model.contactFields
-            }
-                ! []
+            { model | contactFields = transformOneField fieldName Unselected model.contactFields } ! []
 
         SetRequired fieldName True ->
-            { model
-                | contactFields =
-                    transformOneField fieldName (Selected Required) model.contactFields
-            }
-                ! []
+            { model | contactFields = transformOneField fieldName (Selected Required) model.contactFields } ! []
 
         SetRequired fieldName False ->
-            { model
-                | contactFields =
-                    transformOneField fieldName (Selected Optional) model.contactFields
-            }
-                ! []
+            { model | contactFields = transformOneField fieldName (Selected Optional) model.contactFields } ! []
 
 
 transformOneField : FieldName -> FieldSelection -> List Field -> List Field
