@@ -9,38 +9,44 @@ update msg model =
         SetPaletteDrawerStatus paletteDrawerStatus ->
             { model | paletteDrawerStatus = paletteDrawerStatus } ! []
 
-        SetSelected fieldName value ->
+        SetSelected fieldName True ->
             { model
                 | contactFields =
-                    transformOneField fieldName value (Selected Optional) Unselected model.contactFields
+                    transformOneField fieldName (Selected Optional) model.contactFields
             }
                 ! []
 
-        SetRequired fieldName value ->
+        SetSelected fieldName False ->
             { model
                 | contactFields =
-                    transformOneField fieldName value (Selected Required) (Selected Optional) model.contactFields
+                    transformOneField fieldName Unselected model.contactFields
+            }
+                ! []
+
+        SetRequired fieldName True ->
+            { model
+                | contactFields =
+                    transformOneField fieldName (Selected Required) model.contactFields
+            }
+                ! []
+
+        SetRequired fieldName False ->
+            { model
+                | contactFields =
+                    transformOneField fieldName (Selected Optional) model.contactFields
             }
                 ! []
 
 
-transformOneField : FieldName -> Bool -> FieldSelection -> FieldSelection -> List Field -> List Field
-transformOneField fieldName updateValue trueValue falseValue fields =
+transformOneField : FieldName -> FieldSelection -> List Field -> List Field
+transformOneField fieldName value fields =
     fields
-        |> List.map (\field -> conditionalFieldTransform fieldName updateValue trueValue falseValue field)
+        |> List.map (\field -> conditionalFieldTransform fieldName value field)
 
 
-conditionalFieldTransform : FieldName -> Bool -> FieldSelection -> FieldSelection -> Field -> Field
-conditionalFieldTransform fieldName selectStatus trueValue falseValue field =
+conditionalFieldTransform : FieldName -> FieldSelection -> Field -> Field
+conditionalFieldTransform fieldName value field =
     if field.fieldName == fieldName then
-        setSelectionStatus fieldName selectStatus trueValue falseValue field
+        { field | selectionStatus = value }
     else
         field
-
-
-setSelectionStatus : FieldName -> Bool -> FieldSelection -> FieldSelection -> Field -> Field
-setSelectionStatus fieldName selectStatus trueValue falseValue field =
-    if selectStatus then
-        { field | selectionStatus = trueValue }
-    else
-        { field | selectionStatus = falseValue }
