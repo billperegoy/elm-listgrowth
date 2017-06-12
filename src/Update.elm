@@ -33,10 +33,7 @@ transformOneField updateFunction fieldName updateValue fields =
 updateFieldRequirement : FieldName -> Bool -> Field -> Field
 updateFieldRequirement fieldName selectStatus field =
     if field.fieldName == fieldName then
-        if selectStatus then
-            { field | selectionStatus = Selected Required }
-        else
-            { field | selectionStatus = Selected Optional }
+        setSelectionStatus fieldName selectStatus (Selected Required) (Selected Optional) field
     else
         field
 
@@ -44,9 +41,14 @@ updateFieldRequirement fieldName selectStatus field =
 updateSelectStatus : FieldName -> Bool -> Field -> Field
 updateSelectStatus fieldName selectStatus field =
     if field.fieldName == fieldName then
-        if selectStatus then
-            { field | selectionStatus = Selected Optional }
-        else
-            { field | selectionStatus = Unselected }
+        setSelectionStatus fieldName selectStatus (Selected Optional) Unselected field
     else
         field
+
+
+setSelectionStatus : FieldName -> Bool -> FieldSelection -> FieldSelection -> Field -> Field
+setSelectionStatus fieldName selectStatus trueValue falseValue field =
+    if selectStatus then
+        { field | selectionStatus = trueValue }
+    else
+        { field | selectionStatus = falseValue }
