@@ -12,36 +12,28 @@ update msg model =
         SelectField fieldName selectStatus ->
             { model
                 | contactFields =
-                    transformOneField updateSelectStatus fieldName selectStatus model.contactFields
+                    transformOneField fieldName selectStatus (Selected Optional) Unselected model.contactFields
             }
                 ! []
 
         SetRequired fieldName requiredValue ->
             { model
                 | contactFields =
-                    transformOneField updateFieldRequirement fieldName requiredValue model.contactFields
+                    transformOneField fieldName requiredValue (Selected Required) (Selected Optional) model.contactFields
             }
                 ! []
 
 
-transformOneField : (FieldName -> Bool -> Field -> Field) -> FieldName -> Bool -> List Field -> List Field
-transformOneField updateFunction fieldName updateValue fields =
+transformOneField : FieldName -> Bool -> FieldSelection -> FieldSelection -> List Field -> List Field
+transformOneField fieldName updateValue trueValue falseValue fields =
     fields
-        |> List.map (\field -> updateFunction fieldName updateValue field)
+        |> List.map (\field -> conditionalFieldTransform fieldName updateValue trueValue falseValue field)
 
 
-updateFieldRequirement : FieldName -> Bool -> Field -> Field
-updateFieldRequirement fieldName selectStatus field =
+conditionalFieldTransform : FieldName -> Bool -> FieldSelection -> FieldSelection -> Field -> Field
+conditionalFieldTransform fieldName selectStatus trueValue falseValue field =
     if field.fieldName == fieldName then
-        setSelectionStatus fieldName selectStatus (Selected Required) (Selected Optional) field
-    else
-        field
-
-
-updateSelectStatus : FieldName -> Bool -> Field -> Field
-updateSelectStatus fieldName selectStatus field =
-    if field.fieldName == fieldName then
-        setSelectionStatus fieldName selectStatus (Selected Optional) Unselected field
+        setSelectionStatus fieldName selectStatus trueValue falseValue field
     else
         field
 
