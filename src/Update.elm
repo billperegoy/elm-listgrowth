@@ -24,8 +24,7 @@ update msg model =
 
 mapOnFieldMatch : FieldName -> FieldSelection -> List Field -> List Field
 mapOnFieldMatch fieldName value fields =
-    fields
-        |> List.map (updateOnMatch fieldName value)
+    List.map (updateOnMatch fieldName value) fields
 
 
 updateOnMatch : FieldName -> FieldSelection -> Field -> Field
