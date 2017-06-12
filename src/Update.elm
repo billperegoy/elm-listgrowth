@@ -25,11 +25,11 @@ update msg model =
 mapOnFieldMatch : FieldName -> FieldSelection -> List Field -> List Field
 mapOnFieldMatch fieldName value fields =
     fields
-        |> List.map (\field -> conditionalFieldTransform fieldName value field)
+        |> List.map (updateOnMatch fieldName value)
 
 
-conditionalFieldTransform : FieldName -> FieldSelection -> Field -> Field
-conditionalFieldTransform fieldName value field =
+updateOnMatch : FieldName -> FieldSelection -> Field -> Field
+updateOnMatch fieldName value field =
     if field.fieldName == fieldName then
         { field | selectionStatus = value }
     else
