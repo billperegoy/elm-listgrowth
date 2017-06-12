@@ -10,20 +10,20 @@ update msg model =
             { model | paletteDrawerStatus = paletteDrawerStatus } ! []
 
         SetSelected fieldName True ->
-            { model | contactFields = mapOnFieldMatch fieldName (Selected Optional) model.contactFields } ! []
+            { model | contactFields = updateMatchingField fieldName (Selected Optional) model.contactFields } ! []
 
         SetSelected fieldName False ->
-            { model | contactFields = mapOnFieldMatch fieldName Unselected model.contactFields } ! []
+            { model | contactFields = updateMatchingField fieldName Unselected model.contactFields } ! []
 
         SetRequired fieldName True ->
-            { model | contactFields = mapOnFieldMatch fieldName (Selected Required) model.contactFields } ! []
+            { model | contactFields = updateMatchingField fieldName (Selected Required) model.contactFields } ! []
 
         SetRequired fieldName False ->
-            { model | contactFields = mapOnFieldMatch fieldName (Selected Optional) model.contactFields } ! []
+            { model | contactFields = updateMatchingField fieldName (Selected Optional) model.contactFields } ! []
 
 
-mapOnFieldMatch : FieldName -> FieldSelection -> List Field -> List Field
-mapOnFieldMatch fieldName value fields =
+updateMatchingField : FieldName -> FieldSelection -> List Field -> List Field
+updateMatchingField fieldName value fields =
     List.map (updateOnMatch fieldName value) fields
 
 
