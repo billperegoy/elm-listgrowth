@@ -63,7 +63,7 @@ sidebarTableRow field =
             if field.selectionStatus == Immutable then
                 div [] []
             else
-                toggleSwitch SelectField field.fieldName isChecked
+                toggleSwitch SetSelected field.fieldName isChecked
     in
         tr []
             [ td [] [ selectCheckbox ]

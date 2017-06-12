@@ -117,5 +117,5 @@ init =
 
 type Msg
     = SetPaletteDrawerStatus PaletteDrawerStatus
-    | SelectField FieldName Bool
+    | SetSelected FieldName Bool
     | SetRequired FieldName Bool

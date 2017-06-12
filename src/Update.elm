@@ -9,17 +9,17 @@ update msg model =
         SetPaletteDrawerStatus paletteDrawerStatus ->
             { model | paletteDrawerStatus = paletteDrawerStatus } ! []
 
-        SelectField fieldName selectStatus ->
+        SetSelected fieldName value ->
             { model
                 | contactFields =
-                    transformOneField fieldName selectStatus (Selected Optional) Unselected model.contactFields
+                    transformOneField fieldName value (Selected Optional) Unselected model.contactFields
             }
                 ! []
 
-        SetRequired fieldName requiredValue ->
+        SetRequired fieldName value ->
             { model
                 | contactFields =
-                    transformOneField fieldName requiredValue (Selected Required) (Selected Optional) model.contactFields
+                    transformOneField fieldName value (Selected Required) (Selected Optional) model.contactFields
             }
                 ! []
 
